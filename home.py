@@ -52,7 +52,6 @@ def obtener_nombres_archivos(directorio = "./csvdata/"):
     for archivo in os.listdir(directorio):
         if archivo.endswith(".csv"):
             leer_csv(directorio + archivo)
-
             nombres_archivos.append(archivo)
 
     return nombres_archivos    
