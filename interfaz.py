@@ -1,4 +1,5 @@
 import tkinter as tk
+import home
 
 def calcular_trazo():
     # Obtener los valores ingresados por el usuario
@@ -6,7 +7,7 @@ def calcular_trazo():
     trazo = trazo_entry.get()
 
     # Realizar el cálculo del trazo aquí
-    # ...
+    promedio_diamtro = home.leer_csv(variable, trazo)
 
     # Mostrar el resultado en una ventana emergente
     resultado = tk.Toplevel(root)
@@ -14,7 +15,7 @@ def calcular_trazo():
     resultado.geometry("200x100")
     resultado_label = tk.Label(resultado, text="El trazo calculado es: ")
     resultado_label.pack()
-    resultado_valor = tk.Label(resultado, text="Resultado aquí")
+    resultado_valor = tk.Label(resultado, text=str(promedio_diamtro))
     resultado_valor.pack()
 
 # Crear la ventana principal
