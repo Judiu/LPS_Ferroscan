@@ -1,0 +1,13 @@
+﻿"File:[ E:\LPS Ingenieria Estructural\LPS Ingenieria Estructural - Ferroscan\Projects\PRJ_POR ESQUINA\2835.fscan ]"
+     #;        X;Cover;         Ø;Overlay;RealDiam;Quality;   Type;Trace
+      ;        m;   mm;        mm;     mm;      mm;      %
+     1;    0.107;   26;     16 mm;      0;      16;     50;  Rebar;    1
+     2;    0.279;   31;     20 mm;      0;      20;     50;  Rebar;    1
+     3;    0.107;   26;     14 mm;      0;      14;     50;  Rebar;    2
+     4;    0.279;   30;     16 mm;      0;      16;     50;  Rebar;    2
+     5;    0.107;   25;     14 mm;      0;      14;     50;  Rebar;    3
+     6;    0.280;   30;     16 mm;      0;      16;     50;  Rebar;    3
+     7;    0.106;   15;     14 mm;      0;      14;     50;  Rebar;    4
+     8;    0.277;   27;     16 mm;      0;      16;     50;  Rebar;    4
+     9;    0.106;   12;     20 mm;      0;      20;     50;  Rebar;    5
+    10;    0.273;   25;     20 mm;      0;      20;     50;  Rebar;    5
