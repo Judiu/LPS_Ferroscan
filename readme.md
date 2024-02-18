@@ -1,5 +1,5 @@
 <div align="center">
-<img src="public/favicon.svg" height="50px" width="auto" /> 
+<img src="public/LogoLPS.svg" height="50px" width="auto" /> 
 <h3>
  LPS PROCESADOR DE DATOS PARA LPS
 </h3>
