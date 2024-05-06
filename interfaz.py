@@ -1,11 +1,19 @@
 import tkinter as tk
 import home
+import extraerdatos
+from tkinter import filedialog
+
+def obtenerdatos():
+    root = tk.Tk()
+    root.withdraw()
+    file_path = filedialog.askdirectory()
+    print(file_path)
 
 def calcular_trazo():
     # Obtener los valores ingresados por el usuario
     variable = variable_entry.get()
     trazo = trazo_entry.get()
-
+    filepath = filepath_entry.get()
     # Realizar el cálculo del trazo aquí
     promedio_diamtro = home.leer_csv(variable, trazo)
 
@@ -33,6 +41,9 @@ trazo_label = tk.Label(root, text="Trazo a calcular:")
 trazo_label.pack()
 trazo_entry = tk.Entry(root)
 trazo_entry.pack()
+
+filepath_label = tk.Button(root, text="Ruta del archivo:", command=obtenerdatos)
+filepath_label.pack()
 
 calcular_button = tk.Button(root, text="Calcular", command=calcular_trazo)
 calcular_button.pack()
