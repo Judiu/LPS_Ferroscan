@@ -1,6 +1,5 @@
 Sub ProcesarTodosLosCSV()
     Dim folderPath As String
-    Dim fileName As String
     Dim wb As Workbook
     Dim ws As Worksheet
     Dim fso As Object
@@ -8,11 +7,15 @@ Sub ProcesarTodosLosCSV()
     Dim file As Object
 
     ' Ruta de la carpeta que contiene los archivos CSV
-    folderPath = "E:\LPS Ingenieria Estructural\LPS Ingenieria Estructural - Ferroscan\Informes Entrega Final\CR NATURA - MADRID\Datos"
+    folderPath = "E:\LPS Ingenieria Estructural\LPS Ingenieria Estructural - Ferroscan\Informes Entrega Final\Colegio Ricaurte\Datos"
 
     ' Crear un objeto FileSystemObject
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(folderPath)
+
+    ' Desactivar actualizaciones de pantalla para mejorar el rendimiento
+    Application.ScreenUpdating = False
+    Application.Calculation = xlCalculationManual
 
     ' Recorrer todos los archivos en la carpeta
     For Each file In folder.Files
@@ -29,6 +32,10 @@ Sub ProcesarTodosLosCSV()
         End If
     Next file
 
+    ' Restaurar configuraciones de Excel
+    Application.ScreenUpdating = True
+    Application.Calculation = xlCalculationAutomatic
+
     ' Limpiar objetos
     Set fso = Nothing
     Set folder = Nothing
@@ -37,75 +44,72 @@ End Sub
 
 Sub OrdenarObjetos(ws As Worksheet)
     Dim lastrow As Long
-    With ws
-        lastrow = .Cells(.Rows.Count, "A").End(xlUp).Row
-        
-        .Range("L2").Value = lastrow - 3
-        Dim sumRange As Range
-        Dim avgValue As Double
+    Dim sumRange As Range, sumRangeCover As Range
+    Dim avgValue As Double, avgValueCover As Double
+    Dim userInput As Integer
+    Dim filteredValues As Variant
+    Dim cel As Long
+    Dim promedio As Double
 
+    With ws
+        ' Encontrar la última fila con datos en la columna A
+        lastrow = .Cells(.Rows.Count, "A").End(xlUp).Row
+
+        ' Calcular el número de filas de datos
+        .Range("L2").Value = lastrow - 3
+
+        ' Rango de datos para cálculos
         Set sumRange = .Range("D4:D" & lastrow)
+        Set sumRangeCover = .Range("C4:C" & lastrow)
+
+        ' Limpiar y calcular promedios
         sumRange.Replace "mm", "", xlPart
         avgValue = WorksheetFunction.Average(sumRange)
-
-        .Range("L3") = "Diametro Medio"
-        .Range("L4") = avgValue
-        
-        Dim sumRangeCover As Range
-        Dim avgValueCover As Double
-        Set sumRangeCover = .Range("C4:C" & lastrow)
         avgValueCover = WorksheetFunction.Average(sumRangeCover)
-        
-        .Range("M3") = "Promedio Cover"
-        .Range("M4") = avgValueCover
-        
-        Dim userInput As Integer
-        userInput = InputBox("Please enter a value between 1 and 5:" & fileName)
+
+        ' Escribir resultados en las celdas
+        .Range("L3").Value = "Diametro Medio"
+        .Range("L4").Value = avgValue
+        .Range("M3").Value = "Promedio Cover"
+        .Range("M4").Value = avgValueCover
+
+        ' Solicitar entrada del usuario
+        userInput = InputBox("Please enter a value between 1 and 5:")
         If userInput >= 1 And userInput <= 5 Then
-            Dim i As Long
-            Dim cel As Long
-            cel = 4
-            For i = 4 To lastrow
-                If .Cells(i, "I").Value = userInput Then
-                    .Cells(cel, "P").Value = .Cells(i, "B").Value
-                    cel = cel + 1
-                End If
-            Next i
+            ' Filtrar y copiar valores en una sola operación
+            filteredValues = Application.Index(.Range("B4:B" & lastrow).Value, _
+                                               Evaluate("ROW(1:" & lastrow - 3 & ")"), 1)
+            cel = Application.WorksheetFunction.CountIf(.Range("I4:I" & lastrow), userInput)
+            If cel > 0 Then
+                .Range("P4").Resize(cel).Value = filteredValues
+            End If
         Else
             MsgBox "Invalid input. Please enter a value between 1 and 5."
         End If
-        cel = cel - 4
-        .Range("O3") = "Numero de objetos encontrados"
-        .Range("O4") = cel
-        
+
+        ' Escribir el número de objetos encontrados
+        .Range("O3").Value = "Numero de objetos encontrados"
+        .Range("O4").Value = cel
+
+        ' Calcular la separación promedio
+        Dim diffRange As Range
         Dim lastCell As Range
         Dim nextColumnCell As Range
-        Dim lastValue As Double
 
-        ' Encuentra la última celda utilizada en la columna Q
-        Set lastCell = Cells(Rows.Count, "P").End(xlUp)
-        lastValue = CDbl(lastCell.Value)
+        ' Encuentra la última celda utilizada en la columna P
+        Set lastCell = .Cells(.Rows.Count, "P").End(xlUp)
 
-        ' Moverse a la siguiente columna (R)
+        ' Escribir fórmula en la siguiente columna
         Set nextColumnCell = lastCell.Offset(0, 1)
-    
-        ' Escribir la fórmula en la celda de la siguiente columna
         nextColumnCell.FormulaR1C1 = "=RC[-1]-R[-1]C[-1]"
 
-        ' Definir el rango de destino desde la nueva celda hasta la fila 4
-        Dim fillRange As Range
-        Set fillRange = Range(nextColumnCell, Cells(4, nextColumnCell.Column))
+        ' Rellenar automáticamente la fórmula
+        Set diffRange = .Range(nextColumnCell, .Cells(4, nextColumnCell.Column))
+        nextColumnCell.AutoFill Destination:=diffRange, Type:=xlFillDefault
 
-        ' Rellenar automáticamente la fórmula desde la nueva celda hasta la fila 4
-        nextColumnCell.AutoFill Destination:=fillRange, Type:=xlFillDefault
-
-        ' Calcular el promedio de los valores en el rango
-        Dim promedioRange As Range
-        Set promedioRange = Range(nextColumnCell, Cells(4, nextColumnCell.Column))
-        Dim promedio As Double
-        promedio = Application.WorksheetFunction.Average(promedioRange)
-        
-        .Range("N3") = "Separacion promedio"
-        .Range("N4") = promedio * 1000
+        ' Calcular el promedio de las diferencias
+        promedio = WorksheetFunction.Average(diffRange)
+        .Range("N3").Value = "Separacion promedio"
+        .Range("N4").Value = promedio * 1000
     End With
 End Sub
