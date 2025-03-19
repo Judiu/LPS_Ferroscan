@@ -6,8 +6,16 @@ Sub ProcesarTodosLosCSV()
     Dim folder As Object
     Dim file As Object
 
-    ' Ruta de la carpeta que contiene los archivos CSV
-    folderPath = "E:\LPS Ingenieria Estructural\LPS Ingenieria Estructural - Ferroscan\Informes Entrega Final\Colegio Ricaurte\Datos"
+    ' Mostrar cuadro de diálogo para seleccionar la carpeta
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .Title = "Seleccione la carpeta que contiene los archivos CSV"
+        If .Show = -1 Then ' Si el usuario selecciona una carpeta
+            folderPath = .SelectedItems(1)
+        Else
+            MsgBox "No se seleccionó ninguna carpeta. El proceso se cancelará.", vbExclamation
+            Exit Sub
+        End If
+    End With
 
     ' Crear un objeto FileSystemObject
     Set fso = CreateObject("Scripting.FileSystemObject")
